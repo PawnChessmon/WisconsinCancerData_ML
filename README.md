@@ -2,7 +2,6 @@
 
 This repository contains an R Markdown document (`WisconsinCancerData.Rmd`) that performs exploratory data analysis, dimensionality reduction using Principal Component Analysis (PCA), and various clustering techniques on the **Wisconsin Cancer Dataset**. The main goal is to understand the underlying structure of the data and see how well unsupervised learning methods align with actual cancer diagnoses (Malignant vs. Benign).
 
----
 
 ## Analysis Overview
 
@@ -35,7 +34,7 @@ The document explores two different clustering techniques to group similar data 
 
 Finally, the analysis performs **hierarchical clustering again**, but this time it uses only the **first 7 principal components** instead of all the original features. This demonstrates how using dimensionality reduction can sometimes improve clustering efficiency or results. This new hierarchical tree is also **cut into 4 clusters**, and these clusters (derived from the PCs) are compared with the actual diagnoses, as well as the results from the previous hierarchical and k-means clustering for a full comparison.
 
----
+
 
 ## Source
 
