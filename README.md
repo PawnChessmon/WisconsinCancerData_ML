@@ -45,19 +45,3 @@ K. P. Bennett and O. L. Mangasarian: "Robust Linear Programming Discrimination o
 
 ---
 
-## How to Replicate
-
-To run this analysis on your local machine:
-
-1.  **Install R and RStudio** (if you don't have them).
-2.  **Clone this repository**:
-    ```bash
-    git clone [https://github.com/yourusername/WisconsinCancerData.git](https://github.com/yourusername/WisconsinCancerData.git)
-    ```
-3.  **Navigate to the project directory**:
-    ```bash
-    cd WisconsinCancerData
-    ```
-4.  **Open the `WisconsinCancerData.Rmd` file in RStudio.**
-5.  **Install any missing R packages.** RStudio will usually prompt you to install them. You might need `knitr` for knitting the document.
-6.  **Click the "Knit" button in RStudio** (or run `rmarkdown::render("WisconsinCancerData.Rmd")` in the R console) to generate the HTML, PDF, and Word document outputs.
