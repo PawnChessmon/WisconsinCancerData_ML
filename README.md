@@ -1,3 +1,4 @@
+###### Work in progress!
 # Wisconsin Cancer Data Analysis
 
 This repository contains an R Markdown document (`WisconsinCancerData.Rmd`) that performs exploratory data analysis, dimensionality reduction using Principal Component Analysis (PCA), and various clustering techniques on the **Wisconsin Cancer Dataset**. The main goal is to understand the underlying structure of the data and see how well unsupervised learning methods align with actual cancer diagnoses (Malignant vs. Benign).
