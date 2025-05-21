@@ -1,146 +1,63 @@
-# WisconsinCancerData_ML
-Trial of ML methods using data from a study in breast cancer.
+# Wisconsin Cancer Data Analysis
 
-
+This repository contains an R Markdown document (`WisconsinCancerData.Rmd`) that performs exploratory data analysis, dimensionality reduction using Principal Component Analysis (PCA), and various clustering techniques on the **Wisconsin Cancer Dataset**. The main goal is to understand the underlying structure of the data and see how well unsupervised learning methods align with actual cancer diagnoses (Malignant vs. Benign).
 
 ---
-title: "WisconsinCancerData"
-author: "Ritupam"
-date: "`r Sys.Date()`"
-output: html_document
+
+## Analysis Overview
+
+The R Markdown document goes through these key steps:
+
+### Data Loading and Preparation
+
+First, the **Wisconsin Cancer dataset** is downloaded from a URL and loaded into an R data frame. The 30 features (characteristics of the cells) are then extracted into a matrix for analysis. A binary `diagnosis` vector (1 for Malignant, 0 for Benign) is also created; this acts as our reference for checking the clustering results.
+
+### Principal Component Analysis (PCA)
+
+Before PCA, the code calculates and displays **column means** and **standard deviations** for an initial look at the data. Then, **Principal Component Analysis (PCA)** is performed on the scaled data. PCA is a powerful technique that reduces the number of dimensions by transforming the data into new, uncorrelated variables (principal components) that capture most of the data's variance. A **summary of the PCA results** and a **scree plot** are generated to help visualize how much variance each component explains, which can guide how many components to keep.
+
+### PCA Visualization
+
+To better understand the PCA results, a **biplot** is created. This plot shows both individual data points and original variables in the space of the first two principal components. This helps us see how variables contribute to the components and how data points relate to each other. Additionally, **scatter plots** of principal components (PC1 vs. PC2, PC1 vs. PC3, PC2 vs. PC3) are generated and **colored by the actual diagnosis**. These plots visually show if PCA effectively separates malignant from benign cases.
+
+### Variance Explained
+
+The analysis calculates and plots the **proportion of variance explained (PVE)** by each individual principal component, along with the **cumulative PVE**. These plots are crucial for deciding how many principal components are needed to capture a significant amount of the total variance in the dataset.
+
+### Clustering Analysis
+
+The document explores two different clustering techniques to group similar data points:
+
+* **Hierarchical Clustering**: This method involves calculating **Euclidean distances** between scaled data points. Then, it builds a hierarchical tree (dendrogram) using the "complete" linkage method. The tree is then **cut to form 4 clusters**. The resulting cluster assignments are compared against the actual diagnoses using a **contingency table** to see how well the clusters match the known categories.
+* **K-Means Clustering**: **K-means clustering** is performed with **2 centers**, reflecting the two known diagnosis types (Malignant and Benign). The algorithm runs multiple times with different starting points to find the best clustering solution. The k-means cluster assignments are then compared with both the actual diagnoses and the hierarchical clustering results to see how consistent they are.
+
+### Clustering on Principal Components
+
+Finally, the analysis performs **hierarchical clustering again**, but this time it uses only the **first 7 principal components** instead of all the original features. This demonstrates how using dimensionality reduction can sometimes improve clustering efficiency or results. This new hierarchical tree is also **cut into 4 clusters**, and these clusters (derived from the PCs) are compared with the actual diagnoses, as well as the results from the previous hierarchical and k-means clustering for a full comparison.
+
 ---
 
-# Wisconsin Cancer Dataset.
+## Source
 
-```{r}
-url <- "https://assets.datacamp.com/production/course_1903/datasets/WisconsinCancer.csv"
+The Wisconsin Cancer Dataset was originally used in the following research:
 
-# Download the data: wisc.df
-wisc.df = read.csv(url, header = T)
+K. P. Bennett and O. L. Mangasarian: "Robust Linear Programming Discrimination of Two Linearly Inseparable Sets"
 
-# Convert the features of the data: wisc.data
-wisc.data = as.matrix(wisc.df[3:32])
+---
 
-# Set the row names of wisc.data
-row.names(wisc.data) <- wisc.df$id
+## How to Replicate
 
-# Create diagnosis vector
-diagnosis <- as.numeric(wisc.df$diagnosis == "M")
+To run this analysis on your local machine:
 
-```
-
-
-```{r}
-# Check column means and standard deviations
-colMeans(wisc.data)
-apply(wisc.data, 2, sd)
-
-# Execute PCA, scaling if appropriate: wisc.pr
-wisc.pr = prcomp(wisc.data, scale = T)
-
-# Look at summary of results
-summary(wisc.pr)
-plot(wisc.pr)
-```
-
-```{r}
-par(mfrow = c(2, 2))
-# Create a biplot of wisc.pr
-biplot(wisc.pr)
-
-# Scatter plot observations by components 1 and 2
-plot(wisc.pr$x[, c(1, 2)], col = (diagnosis + 1), 
-     xlab = "PC1", ylab = "PC2")
-
-# Repeat for components 1 and 3
-plot(wisc.pr$x[, c(1,3)], col = (diagnosis + 1), 
-     xlab = "PC1", ylab = "PC3")
-
-# Do additional data exploration of your choosing below (optional)
-plot(wisc.pr$x[, c(2,3)], col = (diagnosis + 1), 
-     xlab = "PC2", ylab = "PC3")
-```
-
-```{r}
-# Set up 1 x 2 plotting grid
-par(mfrow = c(1, 2))
-
-# Calculate variability of each component
-pr.var <- wisc.pr$sdev^2
-
-# Variance explained by each principal component: pve
-pve <- pr.var / sum(pr.var)
-
-# Plot variance explained for each principal component
-plot(pve, xlab = "Principal Component", 
-     ylab = "Proportion of Variance Explained", 
-     ylim = c(0, 1), type = "b")
-
-# Plot cumulative proportion of variance explained
-plot(cumsum(pve), xlab = "Principal Component", 
-     ylab = "Cumulative Proportion of Variance Explained", 
-     ylim = c(0, 1), type = "b")
-```
-
-```{r}
-url <- "https://assets.datacamp.com/production/course_1903/datasets/WisconsinCancer.csv"
-
-# Download the data: wisc.df
-wisc.df = read.csv(url, header = T)
-
-# Convert the features of the data: wisc.data
-wisc.data = as.matrix(wisc.df[3:32])
-
-# Set the row names of wisc.data
-row.names(wisc.data) <- wisc.df$id
-
-# Create diagnosis vector
-diagnosis <- as.numeric(wisc.df$diagnosis == "M")
-
-```
-
-```{r}
-# Scale the wisc.data data: data.scaled
-data.scaled = scale(wisc.data)
-
-# Calculate the (Euclidean) distances: data.dist
-data.dist = dist(data.scaled)
-
-# Create a hierarchical clustering model: wisc.hclust
-wisc.hclust = hclust(data.dist, method = "complete")
-
-# Cut tree so that it has 4 clusters: wisc.hclust.clusters
-wisc.hclust.clusters = cutree(wisc.hclust, k = 4)
-
-# Compare cluster membership to actual diagnoses
-table(diagnosis, wisc.hclust.clusters)
-
-# Create a k-means model on wisc.data: wisc.km
-wisc.km = kmeans(scale(wisc.data), centers = 2, nstart = 20)
-
-# Compare k-means to actual diagnoses
-table(wisc.km$cluster, diagnosis)
-
-# Compare k-means to hierarchical clustering
-table(wisc.hclust.clusters, wisc.km$cluster)
-```
-
-```{r}
-wisc.pr = prcomp(wisc.data, scale = T)
-# Create a hierarchical clustering model: wisc.pr.hclust
-wisc.pr.hclust <- hclust(dist(wisc.pr$x[, 1:7]), method = "complete")
-
-# Cut model into 4 clusters: wisc.pr.hclust.clusters
-wisc.pr.hclust.clusters = cutree(wisc.pr.hclust, k = 4)
-
-# Compare to actual diagnoses
-table(diagnosis, wisc.pr.hclust.clusters)
-
-# Compare to k-means and hierarchical
-table(diagnosis, wisc.hclust.clusters)
-table(diagnosis, wisc.km$cluster)
-```
-
-
-
-
+1.  **Install R and RStudio** (if you don't have them).
+2.  **Clone this repository**:
+    ```bash
+    git clone [https://github.com/yourusername/WisconsinCancerData.git](https://github.com/yourusername/WisconsinCancerData.git)
+    ```
+3.  **Navigate to the project directory**:
+    ```bash
+    cd WisconsinCancerData
+    ```
+4.  **Open the `WisconsinCancerData.Rmd` file in RStudio.**
+5.  **Install any missing R packages.** RStudio will usually prompt you to install them. You might need `knitr` for knitting the document.
+6.  **Click the "Knit" button in RStudio** (or run `rmarkdown::render("WisconsinCancerData.Rmd")` in the R console) to generate the HTML, PDF, and Word document outputs.
